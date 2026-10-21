@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boda Rush by Brighton Mambei</title>
+<style>
+body{margin:0;background:#111;font-family:Arial, sans-serif;text-align:center;color:#fff}
+#game{position:relative;width:100%;max-width:420px;height:550px;margin:10px auto;background:linear-gradient(#87CEEB 0%, #FFE4B5 100%);border:4px solid #000;overflow:hidden}
+#city{position:absolute;bottom:80px;width:100%;height:80px;display:flex;align-items:flex-end;justify-content:space-around;opacity:0.9}
+.building{width:42px;background:#555;border:2px solid #000;border-bottom:none}
+#road{position:absolute;bottom:0;width:100%;height:80px;background:#333;border-top:4px dashed #FFEB3B}
+#player{position:absolute;left:60px;bottom:85px;width:40px;height:20px;background:#FF0000;border:2px solid #000;border-radius:4px;z-index:10}
+#player::after{content:"";position:absolute;top:-10px;left:5px;width:12px;height:12px;background:#000;border-radius:50%}
+#obstacle{position:absolute;right:-60px;bottom:80px;width:30px;height:40px;background:#8B0000;border:2px solid #000;z-index:5}
+#coin{position:absolute;right:-40px;bottom:140px;width:22px;height:22px;background:#FFC107;border:2px solid #000;border-radius:50%;z-index:5}
+#score{font-size:20px;font-weight:bold;padding:12px;color:#FFEB3B}
+#btn{padding:18px 40px;font-size:18px;background:#000;color:#FFEB3B;border:3px solid #FFEB3B;border-radius:15px;font-weight:bold}
+</style>
+</head>
+<body>
+<div id="score">Coins: 0 | Score: 0</div>
+<div id="game">
+<div id="city">
+<div class="building" style="height:55px"></div>
+<div class="building" style="height:90px"><div style="font-size:9px;text-align:center;color:#fff;margin-top:5px">KICC</div></div>
+<div class="building" style="height:50px"></div>
+<div class="building" style="height:75px"></div>
+<div class="building" style="height:40px"></div>
+<div class="building" style="height:85px"></div>
+</div>
+<div id="road"></div>
+<div id="player"></div>
+<div id="obstacle"></div>
+<div id="coin"></div>
+</div>
+<button id="btn" onclick="jump()">TAP TO JUMP UP</button>
+<p style="color:#ccc">Collect yellow coins, Avoid red barriers</p>
+<script>
+let player=document.getElementById('player');
+let obs=document.getElementById('obstacle');
+let coin=document.getElementById('coin');
+let scoreBox=document.getElementById('score');
+let coins=0, score=0, bottom=85, jumping=false, gameOver=false;
+
+function jump(){
+ if(jumping||gameOver) return;
+ jumping=true;
+ let up=setInterval(()=>{
+   bottom+=9; player.style.bottom=bottom+'px';
+   if(bottom>=200){clearInterval(up);
+     let down=setInterval(()=>{
+       bottom-=8; player.style.bottom=bottom+'px';
+       if(bottom<=85){clearInterval(down);bottom=85;jumping=false;}
+     },20);
+   }
+ },20);
+}
+function resetObs(){obs.style.left='450px';}
+function resetCoin(){coin.style.left='500px'; coin.style.bottom=(130+Math.random()*70)+'px';}
+function updateScore(){scoreBox.innerHTML='Coins: '+coins+' | Score: '+score;}
+
+let gameLoop=setInterval(()=>{
+ if(gameOver) return;
+ obs.style.left=(obs.offsetLeft-6)+'px';
+ if(obs.offsetLeft<-50){resetObs(); score++; updateScore();}
+ coin.style.left=(coin.offsetLeft-5)+'px';
+ if(coin.offsetLeft<-40){resetCoin();}
+ let oL=obs.offsetLeft, cL=coin.offsetLeft, pB=bottom;
+ if(oL>30 && oL<100 && pB<125){gameOver=true; scoreBox.innerHTML='GAME OVER! Coins:'+coins+' | Refresh to restart';}
+ if(cL>30 && cL<105 && pB> (parseInt(coin.style.bottom)-90) && pB < (parseInt(coin.style.bottom)-40)){
+   coins++; score+=5; resetCoin(); updateScore();
+   player.style.transform='scale(1.3)'; setTimeout(()=>player.style.transform='scale(1)',150);
+ }
+},22);
+resetObs(); resetCoin();
+</script>
+</body>
+</html>
